@@ -287,132 +287,119 @@ $$
 
 ---
 
-## One function for prior predictive simulations
+## Write the pipeline in Target Markdown
 
-* No other user-defined function is required.
+* R Markdown interface for `targets`.
+* Interactive mode for prototyping and emulation.
+* Non-interactive mode for pipeline construction.
+* Template available through RStudio.
 
-```{r, eval = FALSE}
-simulate_data <- function(n_patients = 50, n_visits = 3, n_arms = 2) {
-  # simulation code ...
-  
-  # Stan data list:
-  list(
-    data = data, y = data$response, x = x,
-    n_arms = n_arms, n_beta = length(beta),
-    n_observations = n_patients * n_visits,
-    n_patients = n_patients, n_visits = n_visits,
-    s_beta = 2, s_sigma = 1,
-    # Hold on to draws from the prior:
-    .join_data = list(
-      beta = beta,
-      sigma = sigma,
-      lambda = lambda
-    )
-  )
-}
-```
+<center>
+<img src="./images/target_markdown.png" height="350" align = "center">
+</center>
+
+---
+
+## One function to simulate prior predictive data
+
+* No other user-defined function required.
+* Interactive mode emulates `targets`' behavior in your local environment.
+
+<center>
+<img src="./images/target_markdown_globals.png" height = "400">
+</center>
+
+---
+
+## Simulation and MCMC with {stantargets}
+
+* Non-interactive mode writes the `_targets.R` file and supporting scripts.
+* Declares targets but does not run them.
+
+<center>
+<img src="./images/target_markdown_targets.png" height = "400">
+</center>
+
+---
+
+## Simple target for convergence diagnostics
+
+<center>
+<img src="./images/target_markdown_convergence.png">
+</center>
+
+---
+
+## Simple target for coverage statistics
+
+<center>
+<img src="./images/target_markdown_coverage.png">
+</center>
+
+---
+
+## Optional R code chunk to run the pipeline
+
+* Either run the pipeline in an ordinary R code chunk (below) or invoke `tar_make_clustermq()` outside the R Markdown report.
+
+<center>
+<img src="./images/target_markdown_run.png">
+</center>
 
 ---
 
 
+## Optional R code chunks to read the results
 
-## _targets.R file setup
-
-```{r, eval = FALSE}
-library(targets)
-library(stantargets)
-source("R/functions.R")
-tar_option_set(packages = "tidyverse")
-options(clustermq.scheduler = "multicore") #<<
-list(
-  tar_stan_mcmc_rep_summary(
-    name = model, stan_files = "model.stan", data = simulate_data(),
-    batches = 160, reps = 25, variables = "beta",
-    summaries = list(
-      ~posterior::quantile2(.x, probs = c(0.025, 0.25, 0.75, 0.975)),
-      rhat = posterior::rhat
-    ),
-  ),
-  tar_target(coverage, calculate_coverage(model))
-)
-```
+<center>
+<img src="./images/target_markdown_results.png">
+</center>
 
 ---
 
-## Multiple targets
 
-![](./images/stan-graph.png)
+## The first run takes a long time.
 
----
+* But subsequent runs skip this computation if the results are up to date.
 
-## Run MCMC batches in parallel
+<br>
+<br>
 
-```{r, eval = FALSE}
-> tar_make_clustermq(workers = 4) # 4 local cores
-#> • start target model_batch
-#> • built target model_batch
-#> • start branch model_data_b0b9380a
-#> • start branch model_data_ffcdb73c
-#> • start branch model_data_b968a03a
-#> • start branch model_data_f8763cb2
-#> ...
-```
-
-* High-performance computing with `targets`: <https://books.ropensci.org/targets/hpc.html>
-* Distributed computing available, not just multicore: SLURM, SGE, TORQUE, PBS, LSF 
-* Persistent workers with the [`clustermq`](https://mschubert.github.io/clustermq/) package: `tar_make_clustermq()`
-* Transient workers with the [`future`](https://future.futureverse.org/) package: `tar_make_future()`
-* Monitor progress with [`tar_watch()`](https://docs.ropensci.org/targets/reference/tar_watch.html), [`tar_poll()`](https://docs.ropensci.org/targets/reference/tar_poll.html), or [`tar_progress_branches()`](https://docs.ropensci.org/targets/reference/tar_progress_branches.html).
+<center>
+<img src="./images/tar_make_clustermq.png">
+</center>
 
 ---
 
-## Simulation results
+## Convergence diagnostics
 
-```{r, eval = FALSE}
-tar_read(model)
-#> # A tibble: 8,000 x 10
-#>    variable    q2.5     q25    q75   q97.5  rhat .join_data .rep     .file      .name
-#>    <chr>      <dbl>   <dbl>  <dbl>   <dbl> <dbl>      <dbl> <chr>    <chr>      <chr>
-#>  1 beta[1]   0.411   0.798   1.21   1.58    1.00      0.768 14556f0a model.stan model
-#>  2 beta[2]  -0.816  -0.249   0.336  0.916   1.00      0.163 14556f0a model.stan model
-#>  3 beta[1]  -0.610  -0.220   0.186  0.582   1.00     -0.602 a72e116b model.stan model
-#>  4 beta[2]  -0.527   0.0733  0.692  1.27    1.00      1.15  a72e116b model.stan model
-#>  5 beta[1]  -0.0102  0.357   0.772  1.13    1.00      0.353 df298e43 model.stan model
-#>  6 beta[2]  -0.0254  0.544   1.14   1.71    1.00      0.128 df298e43 model.stan model
-#>  7 beta[1]   0.346   0.732   1.13   1.51    1.00      1.50  7267cadc model.stan model
-#>  8 beta[2]  -1.66   -1.07   -0.475  0.103   1.00     -0.624 7267cadc model.stan model
-#>  9 beta[1]  -1.24   -0.866  -0.455 -0.0642  1.00     -0.682 6ca726a2 model.stan model
-#> 10 beta[2]  -1.68   -1.12   -0.502  0.0777  1.00     -0.139 6ca726a2 model.stan model
-#> # … with 7,990 more rows
-```
+<center>
+<img src="./images/tar_read_convergence.png">
+</center>
 
 ---
-
-## No evidence of lack of convergence.
-
-```{r, eval = FALSE}
-max(tar_read(model)$rhat)
-#> [1] 1.0078
-```
 
 ## Coverage is nominal.
 
-```{r, eval = FALSE}
-tar_read(coverage)
-#> # A tibble: 2 x 3
-#>   variable coverage_50 coverage_95
-#>   <chr>          <dbl>       <dbl>
-#> 1 beta[1]        0.506       0.949
-#> 2 beta[2]        0.495       0.949
-```
+<br>
+
+<center>
+<img src="./images/tar_read_coverage.png">
+</center>
 
 ---
 
 ## Resources
 
+* Source: <https://github.com/wlandau/rmedicine2021-pipeline>
+* Slides: <https://wlandau.github.io/rmedicine2021-slides/>
 * `targets`: <https://docs.ropensci.org/targets/>
+* Target Markdown: <https://books.ropensci.org/targets/markdown.html>
 * `stantargets`:  <https://docs.ropensci.org/stantargets/>
 * Stan: <https://mc-stan.org/>
+* `cmdstanr`: <https://mc-stan.org/cmdstanr/>
+
+---
 
 ## References
 
