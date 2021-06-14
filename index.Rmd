@@ -27,14 +27,14 @@ color: #666666;
 font-size: 2em;
 }
 .title-slide h3 {
-line-height: 6em;
+line-height: 2em;
 color: #666666;
 }
 .title-slide {
 background-color: white;
-background-image: url('images/logo.png');
+background-image: url('images/logos.png');
 background-repeat: no-repeat;
-background-size: 25%;
+background-size: 50%;
 }
 .remark-slide-content:after {
 content: "Copyright Eli Lilly and Company";
@@ -171,20 +171,13 @@ tar_destroy()
 ## Custom user-side code in {targets}
 
 * Most pipelines have a lot of user-side code.
-* `targets` prefers this code to be in pure user-defined functions.
-    * Allows `targets` to clearly parse the relationships among the inputs and outputs.
-    * Strong precedent: user-defined functions are fundamental to most computer languages.
+* `targets` prefers code to be in pure user-defined functions.
 
-> Nearly everything that happens in R results from a function call. Therefore, basic programming centers on creating and refining functions.
->
-> [John Chambers (2008)](https://www.springer.com/gp/book/9780387759357)
+## Challenge
 
-## Drawbacks
+* A lot of user-side software engineering.
 
-* A lot of work.
-* A lot of software engineering.
-    
-## Solution: extend {targets} to abstract away user-side burden
+## Solution: abstract away the burden
 
 * `stantargets` and other domain-specific R Targetopia packages: https://wlandau.github.io/targetopia/
 * Target Markdown, an R Markdown interface for prototyping and pipeline construction: https://books.ropensci.org/targets/markdown.html
@@ -260,8 +253,9 @@ tar_manifest(fields = command)
 
 ---
 
-## Example: Bayesian longitudinal model for clinical trial data
+## Example: Bayesian longitudinal model for clinical trials
 
+<!--
 $$
 \begin{aligned}
 & y \sim \text{MVN}(X_{(n \cdot t) \times p} \beta, \ I_{n \times n} \otimes \Sigma_{t \times t} ) \\
@@ -271,25 +265,13 @@ $$
 & \qquad \qquad \Lambda_{t \times t}\Lambda_{t \times t}' \sim \text{LKJ}(\text{shape} = 1, \text{order} = t)
 \end{aligned} 
 $$
+-->
 
----
+![](./images/model.png)
 
-## Example Stan model
-
-```{c, eval = FALSE}
-// model.stan
-model {
-  vector[n_observations] mu = x * beta; // mean response
-  for (patient in 1:n_patients) { // model each patient separately
-    // ...
-    // Each patient is multivariate normal with the same unstructured covariance:
-    y[first_visit:last_visit] ~ multi_normal_cholesky(mu[first_visit:last_visit], diag_pre_multiply(sigma, lambda));
-  }
-  beta ~ normal(0, s_beta); // independent fixed effects
-  sigma ~ cauchy(0, s_sigma); // diffuse prior on the visit-specific standard deviations
-  lambda ~ lkj_corr_cholesky(1); // LKJ prior on the correlations among visits
-}
-```
+* A more common variant of this model uses inverse-Wishart for the covariance, which induces troublesome prior relationships among covariance components.
+* This new LKJ-based model could help refine models currently used on real clinical trial data. 
+* **But first, we need to ensure the new LKJ-based model is implemented correctly.**
 
 ---
 
@@ -298,15 +280,16 @@ model {
 * For thousands of independent replications:
     * Simulate data from the prior predictive distribution.
     * Fit the model to the simulated data using MCMC.
-    * Calculate x% posterior intervals for each of `beta[1]` and `beta[2]`.
-* For each of `beta[1]` and `beta[2]`, roughly x% of the posterior intervals should cover the corresponding parameter draws from the joint prior.
+    * Calculate x% posterior intervals for each scalar parameter.
+* For each of scalar parameter, roughly x% of the posterior intervals should cover the corresponding parameter draws from the joint prior.
+* 50% and 95% are common choices for x%.
 * Simulation-based calibration extends this idea further ([Cook et al. 2006](https://www.jstor.org/stable/27594203); [Talts et al. 2020](https://arxiv.org/abs/1804.06788)).
 
 ---
 
 ## One function for prior predictive simulations
 
-No other user-defined functions required.
+* No other user-defined function is required.
 
 ```{r, eval = FALSE}
 simulate_data <- function(n_patients = 50, n_visits = 3, n_arms = 2) {
@@ -330,6 +313,8 @@ simulate_data <- function(n_patients = 50, n_visits = 3, n_arms = 2) {
 ```
 
 ---
+
+
 
 ## _targets.R file setup
 
