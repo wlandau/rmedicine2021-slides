@@ -381,10 +381,8 @@ $$
 
 ## Coverage is nominal.
 
-<br>
-
 <center>
-<img src="./images/tar_read_coverage.png">
+<img src="./images/tar_read_coverage.png" height = "500">
 </center>
 
 ---
