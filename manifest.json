@@ -1,0 +1,112 @@
+{
+  "version": 1,
+  "locale": "en_US",
+  "platform": "4.0.2",
+  "metadata": {
+    "appmode": "static",
+    "primary_rmd": null,
+    "primary_html": "index.html",
+    "content_category": "site",
+    "has_parameters": false
+  },
+  "packages": null,
+  "files": {
+    "images/change.png": {
+      "checksum": "25dac7fde84fd53c641bfc0fb7eb7193"
+    },
+    "images/decisions.png": {
+      "checksum": "a7bc7f062e50ba43e7bba92d14b694da"
+    },
+    "images/downstream.png": {
+      "checksum": "c0641c69ca6b55593d14ba7fb96d644f"
+    },
+    "images/figures.pptx": {
+      "checksum": "5e4aee1f6f7bb7b2a1cf14f1605a89c3"
+    },
+    "images/infographic.png": {
+      "checksum": "08b103d4c825ea9a80798b765ebdc20d"
+    },
+    "images/keras-before.png": {
+      "checksum": "6716eff90f241a5b764148d78a2b7525"
+    },
+    "images/keras-command.png": {
+      "checksum": "8fcfa15916cd27615a6135da52e7431e"
+    },
+    "images/keras-function.png": {
+      "checksum": "7e438c2301af71f3b8b13f18a6f08a54"
+    },
+    "images/logo.png": {
+      "checksum": "5346ed955faa6a799c85d40b679cd033"
+    },
+    "images/logos.png": {
+      "checksum": "25211534fd3ee51047ce68bc430fa0f6"
+    },
+    "images/model.png": {
+      "checksum": "ca11689a3cb28f94182b83584caf573b"
+    },
+    "images/pipeline_graph_targets.R": {
+      "checksum": "ffd23071653cb3039ac5709226499bd4"
+    },
+    "images/pipeline_graph.png": {
+      "checksum": "9fb17a94c868b8bb2f313ca108619484"
+    },
+    "images/realities.png": {
+      "checksum": "a98e6d9cb90959221d1de534971a825d"
+    },
+    "images/stan-graph.png": {
+      "checksum": "1ba08e1f5061e8aaeca78696509de6cd"
+    },
+    "images/stantargets.png": {
+      "checksum": "f23ac56b3752bb4119683245b43fecf8"
+    },
+    "images/tar_make_clustermq.png": {
+      "checksum": "876a7954eecb9e02dff65787ad2bfc1f"
+    },
+    "images/tar_read_convergence.png": {
+      "checksum": "19744a422441c991aaf68353113a4cca"
+    },
+    "images/tar_read_coverage.png": {
+      "checksum": "4142743e08d56f3a16d81ac527441fde"
+    },
+    "images/target_markdown_convergence.png": {
+      "checksum": "b912f560f81975dc30e831a2497252ae"
+    },
+    "images/target_markdown_coverage.png": {
+      "checksum": "1bc5c7e3455ed8de7ec3d5d7120d94a4"
+    },
+    "images/target_markdown_globals.png": {
+      "checksum": "9b5e547548f1d94297a605f95015a71c"
+    },
+    "images/target_markdown_results.png": {
+      "checksum": "fd6e9020d5b5e0e9bd76af5f0e1c19f7"
+    },
+    "images/target_markdown_run.png": {
+      "checksum": "02e6ffab199efd2445970a773149ed29"
+    },
+    "images/target_markdown_targets.png": {
+      "checksum": "51aee0eacd533d31420e1f36d83df64a"
+    },
+    "images/target_markdown.png": {
+      "checksum": "e051566ba2a10e76f9e019693da8537d"
+    },
+    "images/targetopia.png": {
+      "checksum": "58e5971c21ae9c4762508de9e3616d4b"
+    },
+    "images/workflow.png": {
+      "checksum": "4ef5ce2b00de37abdd6baee97b9d0d74"
+    },
+    "index_files/header-attrs/header-attrs.js": {
+      "checksum": "9c32b58ed5fd8fe2efbd5bd7023cdef0"
+    },
+    "index_files/remark-css/default-fonts.css": {
+      "checksum": "3dcae1f613a817bfa7ad7e7748e1b0de"
+    },
+    "index_files/remark-css/default.css": {
+      "checksum": "d281055e66f0af38b96060f223243952"
+    },
+    "index.html": {
+      "checksum": "b8e7c925c98c120c7c98053f18f0f0f3"
+    }
+  },
+  "users": null
+}
