@@ -15,13 +15,13 @@
       "checksum": "25dac7fde84fd53c641bfc0fb7eb7193"
     },
     "images/decisions.png": {
-      "checksum": "a7bc7f062e50ba43e7bba92d14b694da"
+      "checksum": "9b4d6099a1fba3c2b54756b1c2d02b2a"
     },
     "images/downstream.png": {
       "checksum": "c0641c69ca6b55593d14ba7fb96d644f"
     },
     "images/figures.pptx": {
-      "checksum": "5e4aee1f6f7bb7b2a1cf14f1605a89c3"
+      "checksum": "7786cef8fd1b69966773cf4cc98e0f59"
     },
     "images/infographic.png": {
       "checksum": "08b103d4c825ea9a80798b765ebdc20d"
@@ -51,7 +51,7 @@
       "checksum": "9fb17a94c868b8bb2f313ca108619484"
     },
     "images/realities.png": {
-      "checksum": "a98e6d9cb90959221d1de534971a825d"
+      "checksum": "3b11d5c9c99d24117a759f8a90353b79"
     },
     "images/stan-graph.png": {
       "checksum": "1ba08e1f5061e8aaeca78696509de6cd"
@@ -59,14 +59,17 @@
     "images/stantargets.png": {
       "checksum": "f23ac56b3752bb4119683245b43fecf8"
     },
+    "images/tar_make_clustermq_skip.png": {
+      "checksum": "23b8cd55163e3472960d5c791e7e61e7"
+    },
     "images/tar_make_clustermq.png": {
       "checksum": "876a7954eecb9e02dff65787ad2bfc1f"
     },
     "images/tar_read_convergence.png": {
-      "checksum": "19744a422441c991aaf68353113a4cca"
+      "checksum": "68299dbcbd1f06c1845c1016d8901c63"
     },
     "images/tar_read_coverage.png": {
-      "checksum": "4142743e08d56f3a16d81ac527441fde"
+      "checksum": "b4a3275ea60e070fb1ae92f8c0bc153e"
     },
     "images/target_markdown_convergence.png": {
       "checksum": "b912f560f81975dc30e831a2497252ae"
@@ -84,7 +87,7 @@
       "checksum": "02e6ffab199efd2445970a773149ed29"
     },
     "images/target_markdown_targets.png": {
-      "checksum": "51aee0eacd533d31420e1f36d83df64a"
+      "checksum": "0d84d9c5baa6edb89ba1992aa4487a44"
     },
     "images/target_markdown.png": {
       "checksum": "e051566ba2a10e76f9e019693da8537d"
@@ -105,7 +108,7 @@
       "checksum": "d281055e66f0af38b96060f223243952"
     },
     "index.html": {
-      "checksum": "b8e7c925c98c120c7c98053f18f0f0f3"
+      "checksum": "7f349143313d86b61921122215fe96e7"
     }
   },
   "users": null
