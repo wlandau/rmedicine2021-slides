@@ -53,7 +53,7 @@ background-size: contain;
 content: "";
 }
 .small {
-  font-size: 85%;
+  font-size: 65%;
 }
 </style>
 
@@ -168,19 +168,16 @@ tar_destroy()
 
 ---
 
-## Custom user-side code in {targets}
+## Challenge
 
 * Most pipelines have a lot of user-side code.
 * `targets` prefers code to be in pure user-defined functions.
+* Leads to a lot of user-side software engineering.
 
-## Challenge
+## Solutions for Bayesian workflows
 
-* A lot of user-side software engineering.
-
-## Solution: abstract away the burden
-
-* `stantargets` and other domain-specific R Targetopia packages: https://wlandau.github.io/targetopia/
-* Target Markdown, an R Markdown interface for prototyping and pipeline construction: https://books.ropensci.org/targets/markdown.html
+* `stantargets` reduces the volume of user-side code and automates entire validation pipelines: <https://docs.ropensci.org/stantargets/articles/simulation.html>
+* Target Markdown is a comfortable interface for interactive prototyping and non-interactive pipeline construction: <https://books.ropensci.org/targets/markdown.html>
   
 ---
 
@@ -269,15 +266,15 @@ $$
 
 ![](./images/model.png)
 
-* A more common variant of this model uses inverse-Wishart for the covariance, which induces troublesome prior relationships among covariance components.
-* This new LKJ-based model could help refine models currently used on real clinical trial data. 
-* **But first, we need to ensure the new LKJ-based model is implemented correctly.**
+* A common variant of this model uses inverse-Wishart for the covariance, which induces troublesome prior relationships among covariance components ([Alvarez et al. 2016](https://arxiv.org/abs/1408.4050)).
+* The above LKJ-based model could help refine some existing models currently used on real clinical trial data. 
+* **But first, we need to ensure the above model is implemented correctly.**
 
 ---
 
 ## Interval-based validation study
 
-* For thousands of independent replications:
+* For several independent replications:
     * Simulate data from the prior predictive distribution.
     * Fit the model to the simulated data using MCMC.
     * Calculate x% posterior intervals for each scalar parameter.
@@ -358,15 +355,18 @@ $$
 ---
 
 
-## The first run takes a long time.
-
-* But subsequent runs skip this computation if the results are up to date.
-
-<br>
-<br>
+## First run takes a long time.
 
 <center>
 <img src="./images/tar_make_clustermq.png">
+</center>
+
+---
+
+## Subsequent runs skip up-to-date targets.
+
+<center>
+<img src="./images/tar_make_clustermq_skip.png">
 </center>
 
 ---
@@ -393,18 +393,32 @@ $$
 * Slides: <https://wlandau.github.io/rmedicine2021-slides/>
 * `targets`: <https://docs.ropensci.org/targets/>
 * Target Markdown: <https://books.ropensci.org/targets/markdown.html>
+* R Markdown: <https://bookdown.org/yihui/rmarkdown>
 * `stantargets`:  <https://docs.ropensci.org/stantargets/>
 * Stan: <https://mc-stan.org/>
 * `cmdstanr`: <https://mc-stan.org/cmdstanr/>
+* `posterior`: <https://mc-stan.org/posterior/>
 
 ---
 
 ## References
 
 .small[
-* Bob Carpenter, Andrew Gelman, Matthew D. Hoffman, Daniel Lee, Ben Goodrich, Michael Betancourt, Marcus Brubaker, Jiqiang Guo, Peter Li, and Allen Riddell. 2017. Stan: A probabilistic programming language. Journal of Statistical Software 76(1). [10.18637/jss.v076.i01](https://www.jstatsoft.org/article/view/v076i01).
-* Samantha R. Cook, Andrew Gelman, and Donald B. Rubin. 2006. "Validation of Software for Bayesian Models Using Posterior Quantiles." Journal of Computational and Graphical Statistics 15 (3): 675–92. <http://www.jstor.org/stable/27594203>.
-* John M. Chambers. 2008. <u>Software for Data Analysis: Programming with R</u>. Chapter 3. Springer, 978-1441926128, <https://www.springer.com/gp/book/9780387759357>.
-* Matt Dancho. "Deep Learning With Keras To Predict Customer Churn." RStudio AI Blog, 2018-01-11. <https://blogs.rstudio.com/tensorflow/posts/2018-01-11-keras-customer-churn/>.
-* Sean Talts, Michael Betancourt, Daniel Simpson, Aki Vehtari, and Andrew Gelman. 2020. "Validating Bayesian Inference Algorithms with Simulation-Based Calibration." <http://arxiv.org/abs/1804.06788>.
+* Alvarez, Ignacio, Jarad Niemi, and Matt Simpson. 2016. “Bayesian Inference for a Covariance Matrix.” http://arxiv.org/abs/1408.4050.
+* Bürkner P, Gabry J, Kay M, Vehtari A (2021). “posterior: Tools
+for Working with Posterior Distributions.” R package version
+0.1.6, <https://mc-stan.org/posterior>.
+* Carpenter, Bob, Andrew Gelman, Matthew D. Hoffman, Daniel Lee, Ben Goodrich, Michael Betancourt, Marcus Brubaker, Jiqiang Guo, Peter Li, and Allen Riddell. 2017. Stan: A probabilistic programming language. Journal of Statistical Software 76(1). [10.18637/jss.v076.i01](https://www.jstatsoft.org/article/view/v076i01).
+* Cook, Samantha R., Andrew Gelman, and Donald B. Rubin. 2006. “Validation of Software for Bayesian Models Using Posterior Quantiles.” Journal of Computational and Graphical Statistics 15 (3): 675–92. http://www.jstor.org/stable/27594203.
+* Gabry, Jonah, and Rok Češnovar (2021). cmdstanr: R Interface
+  to 'CmdStan'. https://mc-stan.org/cmdstanr,
+  https://discourse.mc-stan.org.
+* Gelman, Andrew. 2006. “Prior distributions for variance parameters in hierarchical models (comment on article by Browne and Draper).” Bayesian Analysis 1 (3): 515–34. https://doi.org/10.1214/06-BA117A.
+* Gelman, Andrew, John B. Carlin, Hal S. Stern, David B. Dunson, Aki Vehtari, and Donald B. Rubin. 2014. Bayesian Data Analysis. Edited by Francesca Dominici, Julian J. Faraway, Martin Tanner, and Jim idek. Third. CRC Press.
+* Landau, William Michael. 2021a. “The Stantargets R Package: A Workflow Framework for Efficient Reproducible Stan-Powered Bayesian Data Analysis Pipelines.” Journal of Open Source Software 6 (60): 3193. https://doi.org/10.21105/joss.03193.
+* ———. 2021b. “The Targets R Package: A Dynamic Make-Like Function-Oriented Pipeline Toolkit for Reproducibility and High-Performance Computing.” Journal of Open Source Software 6 (57): 2959. https://doi.org/10.21105/joss.02959.
+* Schubert, Michael. 2019. “clustermq enables efficient parallelization of genomic analyses.” Bioinformatics 35 (21): 4493–95. https://doi.org/10.1093/bioinformatics/btz284.
+* Talts, Sean, Michael Betancourt, Daniel Simpson, Aki Vehtari, and Andrew Gelman. 2020. “Validating Bayesian Inference Algorithms with Simulation-Based Calibration.” http://arxiv.org/abs/1804.06788.
+* Xie, Yihui, J.J. Allaire, and Garrett Grolemund (2018). R Markdown: The Definitive Guide. Chapman and Hall/CRC. ISBN 9781138359338. https://bookdown.org/yihui/rmarkdown.
+* Xie, Yihui, Christophe Dervieux, and Emily Riederer (2020). R Markdown Cookbook. Chapman and Hall/CRC. ISBN 9780367563837. https://bookdown.org/yihui/rmarkdown-cookbook.
 ]
