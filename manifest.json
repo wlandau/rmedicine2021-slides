@@ -60,25 +60,25 @@
       "checksum": "f23ac56b3752bb4119683245b43fecf8"
     },
     "images/tar_make_clustermq_skip.png": {
-      "checksum": "23b8cd55163e3472960d5c791e7e61e7"
+      "checksum": "747afc2f1056ebd0f5403ca9e35c05e4"
     },
     "images/tar_make_clustermq.png": {
-      "checksum": "876a7954eecb9e02dff65787ad2bfc1f"
+      "checksum": "31f9aea047c2646f0a44cf4fa4c68517"
     },
     "images/tar_read_convergence.png": {
-      "checksum": "68299dbcbd1f06c1845c1016d8901c63"
+      "checksum": "874e9131d9667f0042badeea556b5668"
     },
     "images/tar_read_coverage.png": {
-      "checksum": "b4a3275ea60e070fb1ae92f8c0bc153e"
+      "checksum": "6209141371a0011b17315db0671cb38b"
     },
     "images/target_markdown_convergence.png": {
       "checksum": "b912f560f81975dc30e831a2497252ae"
     },
     "images/target_markdown_coverage.png": {
-      "checksum": "1bc5c7e3455ed8de7ec3d5d7120d94a4"
+      "checksum": "ab2d102323d251791cf92220af33e2cc"
     },
     "images/target_markdown_globals.png": {
-      "checksum": "9b5e547548f1d94297a605f95015a71c"
+      "checksum": "3dcc565a241fa35b36ee0aa4a1943b80"
     },
     "images/target_markdown_results.png": {
       "checksum": "fd6e9020d5b5e0e9bd76af5f0e1c19f7"
@@ -87,7 +87,7 @@
       "checksum": "02e6ffab199efd2445970a773149ed29"
     },
     "images/target_markdown_targets.png": {
-      "checksum": "0d84d9c5baa6edb89ba1992aa4487a44"
+      "checksum": "09a55313bd21bfa867987eeef5e3c348"
     },
     "images/target_markdown.png": {
       "checksum": "e051566ba2a10e76f9e019693da8537d"
@@ -108,7 +108,7 @@
       "checksum": "d281055e66f0af38b96060f223243952"
     },
     "index.html": {
-      "checksum": "7f349143313d86b61921122215fe96e7"
+      "checksum": "76d83124cb6adbf6b638b1f7e4adabd6"
     }
   },
   "users": null
