@@ -393,16 +393,22 @@ $$
 * Target Markdown: Christophe Dervieux and Yihui Xie provided crucial advice during initial development.
 * Richard Payne and Karen Price reviewed this Bayesian model validation project.
 
+---
+
 ## Resources
 
-* Source: <https://github.com/wlandau/rmedicine2021-pipeline>
-* Slides: <https://wlandau.github.io/rmedicine2021-slides/>
-* `targets`: <https://docs.ropensci.org/targets/>
-* Target Markdown: <https://books.ropensci.org/targets/markdown.html>
-* `stantargets`:  <https://docs.ropensci.org/stantargets/>
-* Stan: <https://mc-stan.org/>
-* `cmdstanr`: <https://mc-stan.org/cmdstanr/>
-* `posterior`: <https://mc-stan.org/posterior/>
+Resource | Link
+---|---
+Slides | <https://wlandau.github.io/rmedicine2021-slides/>
+Slide source | <https://github.com/wlandau/rmedicine2021-slides/>
+Pipeline report | <https://wlandau.github.io/rmedicine2021-pipeline/>
+Pipeline source | <https://github.com/wlandau/rmedicine2021-pipeline/>
+`targets` | <https://docs.ropensci.org/targets/>
+Target Markdown | <https://books.ropensci.org/targets/markdown.html>
+`stantargets` |  <https://docs.ropensci.org/stantargets/>
+Stan | <https://mc-stan.org/>
+`cmdstanr` | <https://mc-stan.org/cmdstanr/>
+`posterior` | <https://mc-stan.org/posterior/>
 
 ---
 
