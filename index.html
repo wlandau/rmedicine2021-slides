@@ -4,7 +4,6 @@
     <title>Target Markdown and stantargets for Bayesian model validation pipelines</title>
     <meta charset="utf-8" />
     <meta name="author" content="Will Landau" />
-    <script src="index_files/header-attrs/header-attrs.js"></script>
     <link href="index_files/remark-css/default.css" rel="stylesheet" />
     <link href="index_files/remark-css/default-fonts.css" rel="stylesheet" />
   </head>
@@ -260,6 +259,7 @@ $$
     * Calculate x% posterior intervals for each scalar parameter.
 * For each of scalar parameter, roughly x% of the posterior intervals should cover the corresponding parameter draws from the joint prior.
 * 50% and 95% are common choices for x%.
+* Based on the concept of calibration ([Carpenter 2017](https://statmodeling.stat.columbia.edu/2017/04/12/bayesian-posteriors-calibrated/)).
 * Simulation-based calibration extends this idea further ([Cook et al. 2006](https://www.jstor.org/stable/27594203); [Talts et al. 2020](https://arxiv.org/abs/1804.06788)).
 
 ---
@@ -399,6 +399,7 @@ Stan | &lt;https://mc-stan.org/&gt;
 * Bürkner P, Gabry J, Kay M, Vehtari A (2021). “posterior: Tools
 for Working with Posterior Distributions.” R package version
 0.1.6, &lt;https://mc-stan.org/posterior&gt;.
+* Carpenter, Bob. 2017. "Bayesian Posteriors are Calibrated by Definition". Statistical Modeling, Causal Inference, and Social Science. &lt;https://statmodeling.stat.columbia.edu/2017/04/12/bayesian-posteriors-calibrated/&gt;
 * Carpenter, Bob, Andrew Gelman, Matthew D. Hoffman, Daniel Lee, Ben Goodrich, Michael Betancourt, Marcus Brubaker, Jiqiang Guo, Peter Li, and Allen Riddell. 2017. Stan: A probabilistic programming language. Journal of Statistical Software 76(1). [10.18637/jss.v076.i01](https://www.jstatsoft.org/article/view/v076i01).
 * Cook, Samantha R., Andrew Gelman, and Donald B. Rubin. 2006. “Validation of Software for Bayesian Models Using Posterior Quantiles.” Journal of Computational and Graphical Statistics 15 (3): 675–92. http://www.jstor.org/stable/27594203.
 * Gabry, Jonah, and Rok Češnovar (2021). cmdstanr: R Interface
