@@ -110,7 +110,7 @@ tar_destroy()
 
 ---
 
-## Overlooked reality of long computation
+## Repetition: the overlooked bane of long computation
 
 <br>
 
