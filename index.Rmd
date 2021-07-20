@@ -110,11 +110,11 @@ tar_destroy()
 
 ---
 
-## Overlooked realities of long computation
+## Overlooked reality of long computation
 
 <br>
 
-![](./images/realities.png)
+![](./images/reality.png)
 
 ---
 
