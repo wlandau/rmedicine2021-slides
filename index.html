@@ -85,6 +85,14 @@ content: "";
 * Database queries: `DBI`
 * ETL on large data
 
+???
+
+Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but it's a bit pedantic for routine data analysis.
+
+This talk is the debut of a new system called Target Markdown, which has all the convenience of R Markdown and all the power of {targets}. I will also discuss {stantargets}, an extension to {targets} for Bayesian Statistics. Together, these tools make it easy to tackle daunting problems that come up a lot in the life sciences.
+
+And they do come up. Machine learning, MCMC, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
+
 ---
 
 ## Repetition: the overlooked bane of long computation
@@ -93,11 +101,19 @@ content: "";
 
 ![](./images/reality.png)
 
+???
+
+And even if you've done it before, it's easy to underestimate how hard it is to be on the implementation side. It's not as if you just code up all your models, let them run for a while, and then you're done. There will always be bugs to fix, follow-up questions to answer, and all sorts of reasons to rerun all of that slow code. Typically in development, this happens so frequently that you're stuck in a Sisyphean loop where you spend most of your time waiting for jobs to finish and can't seem to get hold of a complete set of current and up-to-date results. Even if the delay is only a minute, you'll feel it.
+
 ---
 
 ## Workflows have interconnected steps.
 
 ![](./images/workflow.png)
+
+???
+
+But what if we broke it down? A data analysis has a flow, and you can put this flow in a pipeline that begins with the data and ends with plots and summaries.
 
 ---
 
@@ -105,17 +121,30 @@ content: "";
 
 ![](./images/change.png)
 
+???
+
+If you change the code for a model, for example,
+
 ---
 
 ## ...the downstream steps are no longer valid.
 
 ![](./images/downstream.png)
 
+
+???
+
+that change invalidates everything that uses that model. The post-processing and summaries for that model need to rerun to get the latest answers. But you shouldn't have to waste time rerunning the data preprocessing and preparation steps that happen before that model, and there's no reason to waste time rerunning any of the other time-consuming models that are still up to date.
+
 ---
 
 ## Dilemma: short runtimes or reproducible results?
 
 ![](./images/decisions.png)
+
+???
+
+On the other hand, skipping steps that are already up to date is a difficult job for a human. It's really hard to know what you can skip and what you can't. And if you incorrectly skip a step, your results aren't reproducible anymore. R Markdown cannot solve this problem.
 
 ---
 
@@ -125,6 +154,10 @@ content: "";
 
 * Save time while ensuring computational reproducibility.
 * Automatic parallel/distributed computing based on the directed acyclic graph.
+
+???
+
+Instead, we need a pipeline tool. If we know the inputs and outputs of each step of the pipeline, then a pipeline tool orchestrates the tasks in a directed acyclic graph and automatically makes objective decisions about what to run and what to skip. So you can adapt to bugfixes quickly without having to think about it, and you have tangible evidence of the status of each step. If the pipeline tool tells you everything is up to date, that's telling you someone else could rerun the same code and they would get the same output you have now. Arguably, that is a definition of reproducibility.
 
 ---
 
@@ -145,6 +178,10 @@ content: "";
 * Surpasses the permanent limitations of its predecessor, [`drake`](https://github.com/ropensci/drake): &lt;https://books.ropensci.org/targets/drake.html&gt;.
 * Continuation of the ideas from `remake` by Rich FitzJohn: &lt;https://github.com/richfitz/remake&gt;.
 
+???
+
+There are a lot of pipeline tools for other languages, but historically not a whole lot for R. The {targets} package, building on the history of {drake} and {remake}, is designed to work seamlessly within R itself, and it abstracts files as R objects so you can program more idiomatically.
+
 ---
 
 ## Challenge
@@ -157,7 +194,11 @@ content: "";
 
 * `stantargets` reduces the volume of user-side code and automates entire validation pipelines: &lt;https://docs.ropensci.org/stantargets/articles/simulation.html&gt;
 * Target Markdown is a comfortable interface for interactive prototyping and non-interactive pipeline construction: &lt;https://books.ropensci.org/targets/markdown.html&gt;
-  
+
+???
+
+
+
 ---
 
 ## Extending {targets}
