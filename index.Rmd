@@ -203,7 +203,7 @@ Instead, we need a pipeline tool. If we know the inputs and outputs of each step
 
 ???
 
-There are a lot of pipeline tools for other languages, but historically not a whole lot for R. The {targets} package, building on the history of {drake} and {remake}, is designed to work seamlessly within R itself, and it abstracts files as R objects so you can program more idiomatically.
+There are a lot of pipeline tools for other languages, but historically not a whole lot for R. The {targets} package, which builds on the history of {drake} and {remake}, is designed to work seamlessly within R itself, and it abstracts files as R objects so you can program more idiomatically.
 
 ---
 
@@ -220,13 +220,19 @@ There are a lot of pipeline tools for other languages, but historically not a wh
 
 ???
 
+But there are drawbacks. Constructing a pipeline requires you to have a clear idea the exact inputs and the exact outputs of each step. You don't have to explicitly declare them like in other tools, because {targets} implicitly detects them using static code analysis, but you do have to be disciplined about the way you structure your R code. And that means writing pure functions to produce datasets, run models on those datasets, and summarize those models. That's a lot of software engineering to ask of a statistician or data analyst.
 
+So what can we do? Well, that's actually the point of this talk. I want to share with you two major breakthroughs that democratize pipelines. 
 
 ---
 
 ## Extending {targets}
 
 ![](./images/targetopia.png)
+
+???
+
+The first is the R Targetopia, an emerging collection of packages like `stantargets` that produce ready-made pipelines for specialized situations. These packages already have functions and targets already built in, so as the user do not have to write nearly as much code.
 
 ---
 
@@ -243,6 +249,10 @@ target_factory <- function(file) {
   )
 }
 ```
+
+???
+
+The mechanism behind `stantargets` is a domain-specific design pattern the I am calling the Target Factory. A target factory is a function that produces one or more target objects, where each target object is a step in the pipeline.
 
 ---
 
@@ -268,6 +278,10 @@ tar_manifest(fields = command)
 #> 3 model "run_model(data)"
 ```
 
+???
+
+If a target factory is part of a package, anyone else can just reuse it in their own pipelines, and get several targets for the price of one, and all the functions those targets depend on are already taken care of, as part of that same package.
+
 ---
 
 ## Example: {stantargets}
@@ -278,6 +292,10 @@ tar_manifest(fields = command)
 
 * Easy pipeline construction for Stan statistical models.
 * Uses R packages [`cmdstanr`](https://mc-stan.org/cmdstanr/) and [`posterior`](https://mc-stan.org/posterior/).
+
+???
+
+{stantargets} was the first package I wrote with target factories. Its purpose is to make Bayesian data analysis easier for statisticians who use Stan.
 
 ---
 
@@ -290,6 +308,10 @@ tar_manifest(fields = command)
     * Indifferent to conjugacy.
 * Variational inference (ADVI)
 * Penalized MLE (L-BFGS)
+
+???
+
+Stan is a probabilistic programming language for all kinds of statistical modeling. It is most famous for Hamiltonian Monte Carlo to fit Bayesian models, but it also variational inference and optimization. It can be really fast, but as with anything Bayesian, it comes with a sizable computational burden. If you use Stan and if you use R, then {stantargets} is worth a try.
 
 ---
 
@@ -313,6 +335,10 @@ $$
 * The above LKJ-based model could help refine some existing models currently used on real clinical trial data. 
 * **But first, we need to ensure the above model is implemented correctly.**
 
+???
+
+We're going to focus on this Bayesian longitudinal linear model. It's like an MMRM but without random effects, and this general kind of model is extremely popular in clinical trial data analysis. But most of the time, you see it with an inverse-Wishart prior if the covariance is unstructured, which induces problematic associations among variances and correlations. A solution is to separately model variances and correlations and to use something like an LKJ prior on the correlation matrix. So I wrote this model in Stan and wanted to try it out on clinical data. But first, we should check that this model is implemented correctly.
+
 ---
 
 ## Interval-based validation study
@@ -326,6 +352,10 @@ $$
 * Based on the concept of calibration ([Carpenter 2017](https://statmodeling.stat.columbia.edu/2017/04/12/bayesian-posteriors-calibrated/)).
 * Simulation-based calibration extends this idea further ([Cook et al. 2006](https://www.jstor.org/stable/27594203); [Talts et al. 2020](https://arxiv.org/abs/1804.06788)).
 
+???
+
+One way to do that is with calibration. You simulate data from the prior predictive distribution, analyze each dataset with the model, and find out how well the posterior parameter samples agree with the parameter samples from the prior. So if we compute a 50% posterior interval for each simulation, then 50% of those intervals should contain the corresponding prior draws of that parameter. Likewise for 95% intervals. If coverage is nominal, that's evidence that the model is implemented correctly. In practice, I have found this exercise to uncover a lot of bugs, and I will walk through it in a moment.
+
 ---
 
 ## Write the pipeline in Target Markdown
@@ -333,11 +363,19 @@ $$
 * R Markdown interface for `targets`.
 * Interactive mode for prototyping and emulation.
 * Non-interactive mode for pipeline construction.
-* Template available through RStudio.
+* Template available through RStudio and [`use_targets()`](https://docs.ropensci.org/targets/reference/use_targets.html).
 
 <center>
 <img src="./images/target_markdown.png" height="350" align = "center">
 </center>
+
+???
+
+When I do, I will use Target Markdown, a brand new system that combines the best of {targets} with the best of R Markdown. We want the power of `stantargets` to run a huge simulation pipeline, and we also want everything to live inside an R Markdown document because it's convenient and because we can explain the details of the methodology right next to the actual code that runs it.
+
+There are two ways to use Target Markdown. There's an interactive mode for testing and prototyping, and there's a non-interactive mode for pipeline construction. What this looks like is you'll just use R Markdown pretty much like you would in other situations, but you have a special {targets} language engine that creates a pipeline behind the scenes. And this pipeline is created code chunk by code chunk.
+
+If you have the latest version of {targets}, you can get an example Target Markdown document either through the RStudio template system or through the use_targets() function.
 
 ---
 
@@ -350,6 +388,10 @@ $$
 <img src="./images/target_markdown_globals.png" height = "400">
 </center>
 
+???
+
+For our Bayesian longitudinal model of clinical trial data, we're in our R Markdown report, and we want to define a function to simulate data from the prior predictive distribution. Thanks to {stantargets}, is the only user-defined function that the pipeline needs. To make it available to the pipeline, we use the {targets} language engine instead of the R language engine, and we set the tar_globals chunk option to TRUE. If you're in the notebook interface and you click the green "play" button on the right, Target Markdown will just run the code and assign it to the environment of the pipeline like it says here at the bottom. You can do this if you want to test and prototype the function locally in your R session.
+
 ---
 
 ## Simulation and MCMC with {stantargets}
@@ -361,6 +403,12 @@ $$
 <img src="./images/target_markdown_targets.png" height = "400">
 </center>
 
+???
+
+But if you the whole report with the Knit button, or if you disable interactive mode manually, the chunk will run in non-interactive mode. That means instead of actually running the code now, Target Markdown will write special R scripts to build on a persistent pipeline that contains the functions or targets defined in the code chunk. This message at the bottom tells you where those scripts were written. These two modes let can seamlessly transition back and forth between prototyping locally and seriously running the pipeline.
+
+In this chunk, we invoke a target factory called tar_stan_mcmc_rep_summary() to define the bulk of the work of this simulation study: draw prior predictive data, run the model, and compute summary statistics and convergence diagnostics. 
+
 ---
 
 ## Simple target for convergence diagnostics
@@ -369,6 +417,10 @@ $$
 <img src="./images/target_markdown_convergence.png">
 </center>
 
+???
+
+You can even turn arbitrary code chunks into targets with the tar_simple chunk option. It will work as long as the chunk acts like a pure function, meaning it returns a value and does not cause any side effects. So here we have one target to summarize convergence diagnostics,
+
 ---
 
 ## Simple target for coverage statistics
@@ -376,6 +428,12 @@ $$
 <center>
 <img src="./images/target_markdown_coverage.png">
 </center>
+
+???
+
+and another target to calculate coverage.
+
+At this point, our entire pipeline is defined. If we were to just stick with the code chunks above, we could click the Knit button to write the entire pipeline and then launch another session outside the report to actually run the pipeline.
 
 ---
 
@@ -387,14 +445,21 @@ $$
 <img src="./images/target_markdown_run.png">
 </center>
 
----
+???
 
+Alternatively, you could define an R code chunk later on to actually run the pipeline inside the report itself. Here, we switch back to the R language engine because we are running the pipeline instead of setting it up.
+
+---
 
 ## Optional R code chunks to read the results
 
 <center>
 <img src="./images/target_markdown_results.png">
 </center>
+
+???
+
+We could also have R code chunks to read and display the results of the pipeline.
 
 ---
 
@@ -405,6 +470,10 @@ $$
 <img src="./images/tar_make_clustermq.png">
 </center>
 
+???
+
+The first time I ran this pipeline, it took almost 7 hours to finish, even though {targets} distributed the simulations across 100 workers of a Sun Grid Engine cluster. That's how big these computations can get.
+
 ---
 
 ## Subsequent runs skip up-to-date targets.
@@ -412,6 +481,10 @@ $$
 <center>
 <img src="./images/tar_make_clustermq_skip.png">
 </center>
+
+???
+
+But the second time around, all the results were up to date, and it took only a few seconds for the whole report to re-render.
 
 ---
 
@@ -421,6 +494,8 @@ $$
 <img src="./images/tar_read_convergence.png">
 </center>
 
+And the last section of the rendered report shows the results. Convergence diagnostics looked great, there was only one simulation out of 1000 with any potential scale reduction factor above 1.01.
+
 ---
 
 ## Coverage is nominal.
@@ -429,13 +504,9 @@ $$
 <img src="./images/tar_read_coverage.png" height = "500">
 </center>
 
----
+???
 
-## Thanks
-
-* `stantargets`: Melina Vidoni served as editor and Krzysztof Sakrejda and Matt Warkentin served as reviewers during the rOpenSci software review process.
-* Target Markdown: Christophe Dervieux and Yihui Xie provided crucial advice during initial development.
-* Richard Payne and Karen Price reviewed this Bayesian model validation project.
+And coverage looks nominal on average. Overall, 50% of the 50% posterior intervals covered the truth, and 95% of the 95% posterior intervals covered the truth, which is evidence of good calibration. So we have a complete, well-documented story wrapped up in an R Markdown document backed by a powerful {targets} pipeline. 
 
 ---
 
@@ -453,6 +524,22 @@ Target Markdown | <https://books.ropensci.org/targets/markdown.html>
 Stan | <https://mc-stan.org/>
 `cmdstanr` | <https://mc-stan.org/cmdstanr/>
 `posterior` | <https://mc-stan.org/posterior/>
+
+???
+
+These slides are publicly available, and so is the fully rendered version of the Target Markdown report I showed today. In these links you can also find the source code of those materials and the various packages I mentioned.
+
+---
+
+## Thanks
+
+* `stantargets`: Melina Vidoni served as editor and Krzysztof Sakrejda and Matt Warkentin served as reviewers during the rOpenSci software review process.
+* Target Markdown: Christophe Dervieux and Yihui Xie provided crucial advice during initial development.
+* Richard Payne and Karen Price reviewed this Bayesian model validation project.
+
+???
+
+I would like to thank everyone who helped out with {targets} and its ecosystem, especially the folks here who helped make {stantargets} and Target Markdown possible. Thanks also to the R Medicine Program Committee for allowing me to speak, and thank you to everyone listening.
 
 ---
 
