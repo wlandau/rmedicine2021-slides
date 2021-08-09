@@ -144,7 +144,7 @@ that change invalidates everything that uses that model. The post-processing and
 
 ???
 
-On the other hand, skipping steps that are already up to date is a difficult job for a human. It's really hard to know what you can skip and what you can't. And if you incorrectly skip a step, your results aren't reproducible anymore. R Markdown cannot solve this problem.
+On the other hand, skipping steps that are already up to date is a difficult job for a human. It's really hard to know what you can skip and what you can't. And if you incorrectly skip a step, your results aren't reproducible anymore.
 
 ---
 
@@ -372,6 +372,8 @@ If you have the latest version of {targets}, you can get an example Target Markd
 
 For our Bayesian longitudinal model of clinical trial data, we're in our R Markdown report, and we want to define a function to simulate data from the prior predictive distribution. Thanks to {stantargets}, is the only user-defined function that the pipeline needs. To make it available to the pipeline, we use the {targets} language engine instead of the R language engine, and we set the tar_globals chunk option to TRUE. If you're in the notebook interface and you click the green "play" button on the right, Target Markdown will just run the code and assign it to the environment of the pipeline like it says here at the bottom. You can do this if you want to test and prototype the function locally in your R session.
 
+Interactive mode for a target or list of targets is similar. Target Markdown will resolve the directed acyclic graph, run the correct targets in the correct order, test that the targets can be stored and retried properly, and then assign them to memory as R variables.
+
 ---
 
 ## Simulation and MCMC with {stantargets}
@@ -474,7 +476,9 @@ But the second time around, all the results were up to date, and it took only a 
 &lt;img src="./images/tar_read_convergence.png"&gt;
 &lt;/center&gt;
 
-And the last section of the rendered report shows the results. Convergence diagnostics looked great, there was only one simulation out of 1000 with any potential scale reduction factor above 1.01.
+???
+
+And the last section of the rendered report shows the results. Convergence diagnostics looked good, there was only one simulation out of 1000 with any potential scale reduction factor above 1.01.
 
 ---
 
