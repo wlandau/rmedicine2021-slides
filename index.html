@@ -87,11 +87,11 @@ content: "";
 
 ???
 
-Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but it's a bit pedantic for routine data analysis.
+Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but on it's own, it's a bit pedantic for routine data analysis.
 
 This talk is the debut of a new system called Target Markdown, which has all the convenience of R Markdown and all the power of {targets}. I will also discuss {stantargets}, an extension to {targets} for Bayesian Statistics. 
 
-Together, these tools make it easy to tackle daunting problems that come up a lot in the life sciences. Machine learning, MCMC, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
+Working together, these tools tackle daunting tasks that come up a lot in the life sciences. Machine learning, Markov chain Monte Carlo, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
 
 ---
 
@@ -103,7 +103,12 @@ Together, these tools make it easy to tackle daunting problems that come up a lo
 
 ???
 
-And even if you've done it before, it's easy to underestimate how hard it is to be on the implementation side. It's not as if you just code up all your models, let them run for a while, and then you're done. There will always be bugs to fix, follow-up questions to answer, and all sorts of reasons to rerun all of that slow code. Typically in development, this happens so frequently that you're stuck in a Sisyphean loop where you spend most of your time waiting for jobs to finish and can't seem to get hold of a complete set of current and up-to-date results. Even if the delay is only a minute, you'll feel it.
+Part of what makes these tasks so daunting is that:
+
+Number one: the code is usually slow, and
+Number two: you're never really done running it.
+
+There are always bugs to fix, follow-up questions to answer, new data, and all sorts of other reasons to rerun all of that slow code. It is easy to get stuck in a Sisyphean loop where you spend a lot of time waiting for jobs to finish and you struggle to get hold of a complete set of results that are current and up to date. Even a single minute of delay between updates is long enough to feel, because it's compounded by every update you make.
 
 ---
 
@@ -113,7 +118,7 @@ And even if you've done it before, it's easy to underestimate how hard it is to 
 
 ???
 
-But what if we broke it down? A data analysis has a flow, and you can put this flow in a pipeline that begins with the data and ends with plots and summaries.
+To get out of the death loop, we have to break it down, and think of a data analysis workflow as a pipeline. A pipeline is a collection of interconnected steps, or targets, with clearly identified inputs and outputs.
 
 ---
 
@@ -134,7 +139,7 @@ If you change the code for a model, for example,
 
 ???
 
-that change invalidates everything that uses that model. The post-processing and summaries for that model need to rerun to get the latest answers. But you shouldn't have to waste time rerunning the data preprocessing and preparation steps that happen before that model, and there's no reason to waste time rerunning any of the other time-consuming models that are still up to date.
+that change invalidates everything that uses that model. The post-processing and summaries for that model need to rerun to get the latest answers. But you shouldn't have to waste time recomputing the upstream data.
 
 ---
 
@@ -144,7 +149,7 @@ that change invalidates everything that uses that model. The post-processing and
 
 ???
 
-On the other hand, skipping steps that are already up to date is a difficult job for a human. It's really hard to know what you can skip and what you can't. And if you incorrectly skip a step, your results aren't reproducible anymore.
+So in real life, which targets can we skip to save time, and which targets really need to rerun? Unfortunately, no human can be trusted to answer that question reliably. Especially if this is a project you haven't touched in several months. To ensure our results are correct while saving as much time as possible, we need automated tools to make objective decisions about what to run and what to skip.
 
 ---
 
@@ -157,7 +162,9 @@ On the other hand, skipping steps that are already up to date is a difficult job
 
 ???
 
-Instead, we need a pipeline tool. If we know the inputs and outputs of each step of the pipeline, then a pipeline tool orchestrates the tasks in a directed acyclic graph and automatically makes objective decisions about what to run and what to skip. So you can adapt to bugfixes quickly without having to think about it, and you have tangible evidence of the status of each step. If the pipeline tool tells you everything is up to date, that's telling you someone else could rerun the same code and they would get the same output you have now. Arguably, that is a definition of reproducibility.
+This is exactly the job of a Make-like pipeline tool. By identifying the inputs and outputs of each target, a Make-like pipeline tool arranges the targets in a directed acyclic graph, and it runs the correct targets in the correct order. And by analyzing the graph, it even detects opportunities to use parallel computing or distributed computing to run multiple targets simultaneously. And of course, it automatically skips any targets whose code or upstream dependencies have not changed.
+
+Not only does this let you adapt to changes quickly, it also gives you tangible evidence of the status of the results. If the pipeline tool tells you everything is up to date, that's telling you that someone else could run your code from scratch and get the same results as you. That is a definition of reproducibility.
 
 ---
 
@@ -180,7 +187,7 @@ Instead, we need a pipeline tool. If we know the inputs and outputs of each step
 
 ???
 
-There are a lot of pipeline tools for other languages, but historically not a whole lot for R. The {targets} package, which builds on the history of {drake} and {remake}, is designed to work seamlessly within R itself, and it abstracts files as R objects so you can program more idiomatically.
+There are hundreds of pipeline tools for other languages, but historically not a whole lot for R. The {targets} package, which builds on its predecessors of {drake} and {remake}, is designed to work seamlessly within R itself. It encourages good programming practices, and it abstracts files as variables, and natively integrates with R Markdown, as you will see soon. So the {targets} package lets you work more naturally in R than a language-agnostic pipeline tool would.
 
 ---
 
@@ -197,9 +204,9 @@ There are a lot of pipeline tools for other languages, but historically not a wh
 
 ???
 
-But there are drawbacks. Constructing a pipeline requires you to have a clear idea the exact inputs and the exact outputs of each step. You don't have to explicitly declare them like in other tools, because {targets} implicitly detects them using static code analysis, but you do have to be disciplined about the way you structure your R code. And that means writing pure functions to produce datasets, run models on those datasets, and summarize those models. That's a lot of software engineering to ask of a statistician or data analyst.
+But there are drawbacks. If you work with {targets} on its own, constructing a pipeline requires you to have a clear idea the exact inputs and the exact outputs of each target. You don't have to explicitly declare them like in other tools, because {targets} automatically analyzes your code to detect them, but you still have to be disciplined about the way you structure your R code. And that means writing pure functions to produce datasets, run models on those datasets, and summarize those models. That's a lot of software engineering to ask of a statistician or data analyst.
 
-So what can we do? Well, that's actually the point of this talk. I want to share with you two major breakthroughs that democratize pipelines. 
+But today, I will share two major breakthroughs that address this usability problem and democratize pipelines, and demonstrate their usefulness with an example in Bayesian Statistics for clinical trials.
 
 ---
 
@@ -209,7 +216,7 @@ So what can we do? Well, that's actually the point of this talk. I want to share
 
 ???
 
-The first is the R Targetopia, an emerging collection of packages like `stantargets` that produce ready-made pipelines for specialized situations. These packages already have functions and targets already built in, so as the user do not have to write nearly as much code.
+The first is the R Targetopia, an emerging collection of packages like `stantargets` that produce ready-made pipelines for specialized situations. These packages already have functions and targets built in, so the user do not have to write nearly as much code or think as hard about engineering the pipeline at a low level.
 
 ---
 
@@ -219,6 +226,14 @@ The first is the R Targetopia, an emerging collection of packages like `stantarg
 
 
 ```r
+#' @title Example target factory in an R package.
+#' @export
+#' @description A target factory to analyze data.
+#' @return A list of 3 target objects to:
+#'   1. Track the file for changes,
+#'   2. Read the data in the file, and
+#'   3. Analyze the data.
+#' @param File Character of length 1, path to the file.
 target_factory &lt;- function(file) {
   list(
     tar_target_raw("file", file, format = "file", deployment = "main"),
@@ -230,7 +245,7 @@ target_factory &lt;- function(file) {
 
 ???
 
-The mechanism behind `stantargets` is a domain-specific design pattern the I am calling the Target Factory. A target factory is a function that produces one or more target objects, where each target object is a step in the pipeline.
+The mechanism behind these packages is a domain-specific pattern the called the Target Factory. A target factory is a function, usually in a package, that produces one or more target objects. A target object is just the definition of a target represented in a special instance of an S3 class.
 
 ---
 
@@ -260,7 +275,7 @@ tar_manifest(fields = command)
 
 ???
 
-If a target factory is part of a package, anyone else can just reuse it in their own pipelines, and get several targets for the price of one, and all the functions those targets depend on are already taken care of, as part of that same package.
+For the user, target factories simplify pipeline construction. In this example, you feel like you're only writing one target, but you actually get three. So the details of constructing those targets and connecting them together are all abstracted away.
 
 ---
 
@@ -275,8 +290,7 @@ If a target factory is part of a package, anyone else can just reuse it in their
 
 ???
 
-{stantargets} was the first package I wrote with target factories. Its purpose is to make Bayesian data analysis easier for statisticians who use Stan.
-
+{stantargets} leverages this idea for Bayesian data analysis with Stan. It has target factories from single-run workflows to large-scale simulation studies. If you use R and you use Stan, {stantargets} is worth trying out.
 ---
 
 ## About Stan
@@ -291,7 +305,7 @@ If a target factory is part of a package, anyone else can just reuse it in their
 
 ???
 
-Stan is a probabilistic programming language for all kinds of statistical modeling. It is most famous for Hamiltonian Monte Carlo to fit Bayesian models, but it also variational inference and optimization. It can be really fast, but as with anything Bayesian, it comes with a sizable computational burden. If you use Stan and if you use R, then {stantargets} is worth a try.
+A bit of background: Stan is a probabilistic programming language for all kinds of statistical modeling. It is most famous for Hamiltonian Monte Carlo to fit Bayesian models, but it also variational inference and optimization. It can be really fast, but as with anything Bayesian, it inevitably comes with a nontrivial computational burden, which is exactly where {targets} and {stantargets} can help.
 
 ---
 
@@ -317,7 +331,13 @@ $$
 
 ???
 
-We're going to focus on this Bayesian longitudinal linear model. It's like an MMRM but without random effects, and this general kind of model is extremely popular in clinical trial data analysis. But most of the time, you see it with an inverse-Wishart prior if the covariance is unstructured, which induces problematic associations among variances and correlations. A solution is to separately model variances and correlations and to use something like an LKJ prior on the correlation matrix. So I wrote this model in Stan and wanted to try it out on clinical data. But first, we should check that this model is implemented correctly.
+I'm going to show how this works using a Bayesian longitudinal linear model. What you see here is like an MMRM but without random effects. I don't claim it's the best model, but it is extremely popular in clinical trial data analysis.
+
+Most of the time, you see it with an inverse-Wishart prior if the covariance is unstructured, and this induces problematic associations among variances and correlations.
+
+Which motivates the model you see here. A solution is to model the variances and the correlations separately and to use an LKJ prior or similar on the correlation matrix. It was straightforward to write this model in Stan because Stan is so flexible and because the algorithms are indifferent to conditional conjugacy. 
+
+Before using this model in the topline analysis of an actual clinical trial, we need to validate it. That includes checking all sorts of issues, one of which is the correctness of the implementation. In other words, does the Stan code accurately follow the model specification?
 
 ---
 
@@ -334,7 +354,7 @@ We're going to focus on this Bayesian longitudinal linear model. It's like an MM
 
 ???
 
-One way to do that is with calibration. You simulate data from the prior predictive distribution, analyze each dataset with the model, and find out how well the posterior parameter samples agree with the parameter samples from the prior. So if we compute a 50% posterior interval for each simulation, then 50% of those intervals should contain the corresponding prior draws of that parameter. Likewise for 95% intervals. If coverage is nominal, that's evidence that the model is implemented correctly. In practice, I have found this exercise to uncover a lot of bugs, and I will walk through it in a moment.
+One way to do that is with calibration. The idea is to simulate thousands of datasets from the prior predictive distribution, analyze each dataset with the model, and find out how well the posterior parameter samples agree with the parameter samples from the prior. So if we compute a 50% posterior interval for each simulation, then 50% of those intervals should contain the corresponding prior draws of that parameter. Likewise for 95% intervals or whatever credible level you choose. If coverage is nominal, that's evidence that the analysis model and the data-generating model agree. In practice, I have found this exercise to uncover a lot of bugs, and I will walk through it in a moment.
 
 ---
 
@@ -351,9 +371,9 @@ One way to do that is with calibration. You simulate data from the prior predict
 
 ???
 
-When I do, I will use Target Markdown, a brand new system that combines the best of {targets} with the best of R Markdown. We want the power of `stantargets` to run a huge simulation pipeline, and we also want everything to live inside an R Markdown document because it's convenient and because we can explain the details of the methodology right next to the actual code that runs it.
+When I do, I will use Target Markdown, a brand new system that combines the best of {targets} with the best of R Markdown. We want the power of `stantargets` to run a huge simulation pipeline, and we also want everything to live inside R Markdown documents because it's convenient and because we can explain the details of the methodology right next to the actual code that runs it.
 
-There are two ways to use Target Markdown. There's an interactive mode for testing and prototyping, and there's a non-interactive mode for pipeline construction. What this looks like is you'll just use R Markdown pretty much like you would in other situations, but you have a special {targets} language engine that creates a pipeline behind the scenes. And this pipeline is created code chunk by code chunk.
+There are two ways to use Target Markdown. There's an interactive mode for testing and prototyping, and there's a non-interactive mode for pipeline construction. What this looks like is you'll just use R Markdown pretty much like you would in other situations, but you have a special {targets} language engine that creates a pipeline behind the scenes, one code chunk at a time. This works whether you have a single R Markdown report or multiple reports like in a `bookdown` project.
 
 If you have the latest version of {targets}, you can get an example Target Markdown document either through the RStudio template system or through the use_targets() function.
 
@@ -370,9 +390,9 @@ If you have the latest version of {targets}, you can get an example Target Markd
 
 ???
 
-For our Bayesian longitudinal model of clinical trial data, we're in our R Markdown report, and we want to define a function to simulate data from the prior predictive distribution. Thanks to {stantargets}, is the only user-defined function that the pipeline needs. To make it available to the pipeline, we use the {targets} language engine instead of the R language engine, and we set the tar_globals chunk option to TRUE. If you're in the notebook interface and you click the green "play" button on the right, Target Markdown will just run the code and assign it to the environment of the pipeline like it says here at the bottom. You can do this if you want to test and prototype the function locally in your R session.
+So we're inside an R Markdown report. And to study the calibration of our Bayesian model of clinical trial data, we want to define a function to simulate data from the prior predictive distribution. Thanks to {stantargets}, this is the only user-defined function that the pipeline needs us to write by hand. To make this function and other global objects available to the pipeline as dependencies, we use the {targets} language engine instead of the R language engine, and we set the tar_globals chunk option to TRUE. If you're in the notebook interface and you click the green "play" button on the right, Target Markdown will just run the code and assign it to the environment of the pipeline like it says here at the bottom. You can do this if you want to test and prototype the function locally in your R session, and you can divide up your functions and globals among multiple code chunks like this one.
 
-Interactive mode for a target or list of targets is similar. Target Markdown will resolve the directed acyclic graph, run the correct targets in the correct order, test that the targets can be stored and retried properly, and then assign them to memory as R variables.
+Interactive mode for a target or list of targets is similar. Target Markdown will resolve the directed acyclic graph, run the correct targets in the correct order out of the ones in the chunk, test that the targets can be stored and retrieved properly, and then assign them to memory as variables in your R session.
 
 ---
 
@@ -387,9 +407,11 @@ Interactive mode for a target or list of targets is similar. Target Markdown wil
 
 ???
 
-But if you the whole report with the Knit button, or if you disable interactive mode manually, the chunk will run in non-interactive mode. That means instead of actually running the code now, Target Markdown will write special R scripts to build on a persistent pipeline that contains the functions or targets defined in the code chunk. This message at the bottom tells you where those scripts were written. These two modes let can seamlessly transition back and forth between prototyping locally and seriously running the pipeline.
+So interactive mode runs code in your environment and saves nothing to persistent storage. It's for testing and prototyping only, and the results go away when you restart your R session. But non-interactive mode, which runs when you knit the entire document, is the opposite. Non-interactive mode does not actually execute the code in the chunk. Instead, it saves that code to a script file to define part of the pipeline. That goes for functions like in the previous slide, as well as targets and target factories like you see here. The idea is to incrementally define a pipeline now, and then do a serious run of the pipeline outside of Target Markdown later on once all the R scripts are established. 
 
-In this chunk, we invoke a target factory called tar_stan_mcmc_rep_summary() to define the bulk of the work of this simulation study: draw prior predictive data, run the model, and compute summary statistics and convergence diagnostics. 
+In this chunk, we invoke a target factory called tar_stan_mcmc_rep_summary() to define the bulk of the work of this simulation study: draw prior predictive data, run the model, and compute summary statistics and convergence diagnostics.
+
+You don't need to worry about what R script file to put it in or how targets and functions are organized within scripts. Thanks to Target Markdown, all you need to focus on is the chunks inside the report.
 
 ---
 
@@ -401,7 +423,7 @@ In this chunk, we invoke a target factory called tar_stan_mcmc_rep_summary() to 
 
 ???
 
-You can even turn arbitrary code chunks into targets with the tar_simple chunk option. It will work as long as the chunk acts like a pure function, meaning it returns a value and does not cause any side effects. So here we have one target to summarize convergence diagnostics,
+For even more smoothness, you can even turn arbitrary code chunks into targets with the tar_simple chunk option, with the chunk code as the command and the chunk label as the target name. It will work as long as the chunk acts like a pure function, meaning it returns a value and does not cause any side effects. So here we have one target to summarize convergence diagnostics,
 
 ---
 
@@ -415,7 +437,7 @@ You can even turn arbitrary code chunks into targets with the tar_simple chunk o
 
 and another target to calculate coverage.
 
-At this point, our entire pipeline is defined. If we were to just stick with the code chunks above, we could click the Knit button to write the entire pipeline and then launch another session outside the report to actually run the pipeline.
+At this point, our entire pipeline is defined. When we run the report from end to end, the script files get written, and the report returns quickly. We then have the option of running the pipeline using the `tar_make()` function or similar.
 
 ---
 
@@ -429,7 +451,7 @@ At this point, our entire pipeline is defined. If we were to just stick with the
 
 ???
 
-Alternatively, you could define an R code chunk later on to actually run the pipeline inside the report itself. Here, we switch back to the R language engine because we are running the pipeline instead of setting it up.
+In this example, we run the pipeline in the same report that defines the pipeline. We write an ordinary R code chunk after all the targets chunks, so were not using the {targets} engine anymore, and we call the `tar_make_clustermq()` function to distribute our simulations across 100 workers on a computing cluster.
 
 ---
 
@@ -441,7 +463,7 @@ Alternatively, you could define an R code chunk later on to actually run the pip
 
 ???
 
-We could also have R code chunks to read and display the results of the pipeline.
+It's also nice to have ordinary R code chunks to read the results from the {targets} data store.
 
 ---
 
@@ -454,7 +476,7 @@ We could also have R code chunks to read and display the results of the pipeline
 
 ???
 
-The first time I ran this pipeline, it took almost 7 hours to finish, even though {targets} distributed the simulations across 100 workers of a Sun Grid Engine cluster. That's how big these computations can get.
+The first time I ran this pipeline, it took almost 7 hours to finish, despite the heavy-duty distributed computing. That's how large Bayesian computation can get sometimes.
 
 ---
 
@@ -466,7 +488,7 @@ The first time I ran this pipeline, it took almost 7 hours to finish, even thoug
 
 ???
 
-But the second time around, all the results were up to date, and it took only a few seconds for the whole report to re-render.
+But the second time around, all the results were up to date. Thanks to {targets}, it took only a few seconds for the whole report to re-render. So Target Markdown is kind of like the caching system in {knitr}, but taking it to the next level.
 
 ---
 
@@ -490,7 +512,7 @@ And the last section of the rendered report shows the results. Convergence diagn
 
 ???
 
-And coverage looks nominal on average. Overall, 50% of the 50% posterior intervals covered the truth, and 95% of the 95% posterior intervals covered the truth, which is evidence of good calibration. So we have a complete, well-documented story wrapped up in an R Markdown document backed by a powerful {targets} pipeline. 
+And coverage looks nominal. On average, 50% of the 50% posterior intervals covered the truth, and 95% of the 95% posterior intervals covered the truth, which is evidence of good calibration. So we have a complete, well-documented story wrapped up in an R Markdown document backed by a powerful {targets} pipeline. 
 
 ---
 
@@ -523,7 +545,7 @@ These slides are publicly available, and so is the fully rendered version of the
 
 ???
 
-I would like to thank everyone who helped out with {targets} and its ecosystem, especially the folks here who helped make {stantargets} and Target Markdown possible. Thanks also to the R Medicine Program Committee for allowing me to speak, and thank you to everyone listening.
+I would like to thank everyone who helped out with {targets} and its ecosystem, especially the folks listed here who helped make {stantargets} and Target Markdown possible. Thanks also to the R Medicine Program Committee for allowing me to speak, and thank you to everyone listening.
 
 ---
 
