@@ -112,9 +112,9 @@ tar_destroy()
 
 Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but it's a bit pedantic for routine data analysis.
 
-This talk is the debut of a new system called Target Markdown, which has all the convenience of R Markdown and all the power of {targets}. I will also discuss {stantargets}, an extension to {targets} for Bayesian Statistics. Together, these tools make it easy to tackle daunting problems that come up a lot in the life sciences.
+This talk is the debut of a new system called Target Markdown, which has all the convenience of R Markdown and all the power of {targets}. I will also discuss {stantargets}, an extension to {targets} for Bayesian Statistics. 
 
-And they do come up. Machine learning, MCMC, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
+Together, these tools make it easy to tackle daunting problems that come up a lot in the life sciences. Machine learning, MCMC, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
 
 ---
 
