@@ -110,11 +110,11 @@ tar_destroy()
 
 ???
 
-Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but it's a bit pedantic for routine data analysis.
+Every workflow system has tradeoffs. R Markdown is easy to use, but it struggles to handle a lot of code and a lot of runtime. On the other hand the {targets} package handles a ton of work, but on it's own, it's a bit pedantic for routine data analysis.
 
 This talk is the debut of a new system called Target Markdown, which has all the convenience of R Markdown and all the power of {targets}. I will also discuss {stantargets}, an extension to {targets} for Bayesian Statistics. 
 
-Together, these tools make it easy to tackle daunting problems that come up a lot in the life sciences. Machine learning, MCMC, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
+Working together, these tools tackle daunting tasks that come up a lot in the life sciences. Machine learning, Markov chain Monte Carlo, simulation, prediction, genomics, PK/PD, and database queries are just some examples.
 
 ---
 
@@ -126,7 +126,12 @@ Together, these tools make it easy to tackle daunting problems that come up a lo
 
 ???
 
-And even if you've done it before, it's easy to underestimate how hard it is to be on the implementation side. It's not as if you just code up all your models, let them run for a while, and then you're done. There will always be bugs to fix, follow-up questions to answer, and all sorts of reasons to rerun all of that slow code. Typically in development, this happens so frequently that you're stuck in a Sisyphean loop where you spend most of your time waiting for jobs to finish and can't seem to get hold of a complete set of current and up-to-date results. Even if the delay is only a minute, you'll feel it.
+Part of what makes these tasks so daunting is that:
+
+Number one: the code is usually slow, and
+Number two: you're never really done running it.
+
+There are always bugs to fix, follow-up questions to answer, new data, and all sorts of other reasons to rerun all of that slow code. It is easy to get stuck in a Sisyphean loop where you spend a lot of time waiting for jobs to finish and you struggle to get hold of a complete set of results that are current and up to date. Even a single minute of delay between updates is long enough to feel, because it's compounded by every update you make.
 
 ---
 
@@ -136,7 +141,7 @@ And even if you've done it before, it's easy to underestimate how hard it is to 
 
 ???
 
-But what if we broke it down? A data analysis has a flow, and you can put this flow in a pipeline that begins with the data and ends with plots and summaries.
+To get out of the death loop, we have to break it down, and think of a data analysis workflow as a pipeline. A pipeline is a collection of interconnected steps, or targets, with clearly identified inputs and outputs.
 
 ---
 
@@ -157,7 +162,7 @@ If you change the code for a model, for example,
 
 ???
 
-that change invalidates everything that uses that model. The post-processing and summaries for that model need to rerun to get the latest answers. But you shouldn't have to waste time rerunning the data preprocessing and preparation steps that happen before that model, and there's no reason to waste time rerunning any of the other time-consuming models that are still up to date.
+that change invalidates everything that uses that model. The post-processing and summaries for that model need to rerun to get the latest answers. But you shouldn't have to waste time recomputing the upstream data.
 
 ---
 
@@ -167,7 +172,7 @@ that change invalidates everything that uses that model. The post-processing and
 
 ???
 
-On the other hand, skipping steps that are already up to date is a difficult job for a human. It's really hard to know what you can skip and what you can't. And if you incorrectly skip a step, your results aren't reproducible anymore.
+So in real life, which targets can we skip to save time, and which targets really need to rerun? Unfortunately, no human can be trusted to answer that question reliably. Especially if this is a project you haven't touched in several months. To ensure our results are correct while saving as much time as possible, we need automated tools to make objective decisions about what to run and what to skip.
 
 ---
 
@@ -180,7 +185,9 @@ On the other hand, skipping steps that are already up to date is a difficult job
 
 ???
 
-Instead, we need a pipeline tool. If we know the inputs and outputs of each step of the pipeline, then a pipeline tool orchestrates the tasks in a directed acyclic graph and automatically makes objective decisions about what to run and what to skip. So you can adapt to bugfixes quickly without having to think about it, and you have tangible evidence of the status of each step. If the pipeline tool tells you everything is up to date, that's telling you someone else could rerun the same code and they would get the same output you have now. Arguably, that is a definition of reproducibility.
+This is exactly the job of a Make-like pipeline tool. By identifying the inputs and outputs of each target, a Make-like pipeline tool arranges the targets in a directed acyclic graph, and it runs the correct targets in the correct order. And by analyzing the graph, it even detects opportunities to use parallel computing or distributed computing to run multiple targets simultaneously. And of course, it automatically skips any targets whose code or upstream dependencies have not changed.
+
+Not only does this let you adapt to changes quickly, it also gives you tangible evidence of the status of the results. If the pipeline tool tells you everything is up to date, that's telling you that someone else could run your code from scratch and get the same results as you. That is a definition of reproducibility.
 
 ---
 
